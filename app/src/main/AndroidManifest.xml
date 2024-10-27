@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyD7P0JGn3HQtwoVhqwUtu8lytE3gKssBvw" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -10,8 +14,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Taller3"
+        android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar"
         tools:targetApi="31">
+
+        <activity android:name=".RegisterActivity"></activity>
+        <activity android:name=".UserListActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Taller3</string>
+    <string name="correo_electrOnico">Correo electrónico</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="registrate">Regístrate</string>
+    <string name="iniciar_sesion">Iniciar Sesión</string>
+    <string name="nombre">Nombre</string>
+    <string name="apellido">Apellido</string>
+    <string name="registrar">Registrar</string>
+    <string name="numero_de_identificacion">Número de identificación</string>
+    <string name="longitud">Longitud</string>
+    <string name="latitud">Latitud</string>
+    <string name="seleccionar_imagen">Seleccionar Imagen</string>
 </resources>
