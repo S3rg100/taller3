@@ -9,16 +9,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 
 class UserListActivity : AppCompatActivity() {
 
@@ -35,7 +32,6 @@ class UserListActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         loadUsers()
-
         auth = Firebase.auth
     }
 
@@ -54,19 +50,17 @@ class UserListActivity : AppCompatActivity() {
                 true
             }
             R.id.action_edit_user -> {
-                // Lógica para editar usuario
-                Toast.makeText(this, "Editar usuario...", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, EditUserActivity::class.java)
+                startActivity(intent)
                 true
             }
             R.id.action_toggle_status -> {
-                // Lógica para cambiar el estado
                 toggleUserStatus()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 
     private fun toggleUserStatus() {
         val userId = auth.currentUser?.uid ?: return
@@ -101,7 +95,7 @@ class UserListActivity : AppCompatActivity() {
                 Log.d("UserListActivity", "DataSnapshot received: ${dataSnapshot.childrenCount} users")
 
                 for (userSnapshot in dataSnapshot.children) {
-                    val user = userSnapshot.getValue<User>()
+                    val user = userSnapshot.getValue(User::class.java)
 
                     if (user != null) {
                         Log.d("UserListActivity", "User found: ${user.nombre} with status ${user.estado}")
@@ -127,6 +121,4 @@ class UserListActivity : AppCompatActivity() {
 
         databaseRef.addValueEventListener(userListener)
     }
-
-
 }
