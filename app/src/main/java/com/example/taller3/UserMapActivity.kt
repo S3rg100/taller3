@@ -8,70 +8,96 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
-import com.google.firebase.ktx.Firebase
 
 class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
-
     private lateinit var mMap: GoogleMap
     private lateinit var auth: FirebaseAuth
-    private var userLatitude: Double = 0.0
-    private var userLongitude: Double = 0.0
-    private var availableUserLocation: LatLng? = null
+    private var userMarker: Marker? = null
+    private var availableUserMarker: Marker? = null
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_map)
 
-        auth = Firebase.auth
-        userLatitude = intent.getDoubleExtra("USER_LATITUDE", 0.0)
-        userLongitude = intent.getDoubleExtra("USER_LONGITUDE", 0.0)
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
 
-        // Inicializar el fragmento del mapa
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        updateUserMarkers()
+        setupAuthenticatedUserMarker()
+        setupAvailableUserMarker()
     }
 
-    private fun updateUserMarkers() {
-        // Mostrar el marcador azul de la ubicación del usuario autenticado
-        val userLocation = LatLng(userLatitude, userLongitude)
-        mMap.addMarker(
-            MarkerOptions().position(userLocation).title("Tú")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-        )
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10f))
+    private fun setupAuthenticatedUserMarker() {
+        val userId = auth.currentUser?.uid ?: return
 
-        // Obtener y mostrar la ubicación del usuario "Disponible" de Firebase
-        val databaseRef = FirebaseDatabase.getInstance().getReference("users")
-        databaseRef.child("disponible").addValueEventListener(object : ValueEventListener {
+        // Escuchar cambios de ubicación del usuario autenticado
+        val userLocationRef = database.child("users").child(userId).child("location")
+        userLocationRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val lat = snapshot.child("latitud").getValue(Double::class.java) ?: 0.0
-                val lng = snapshot.child("longitud").getValue(Double::class.java) ?: 0.0
-                availableUserLocation = LatLng(lat, lng)
+                val latitude = snapshot.child("lat").getValue(Double::class.java) ?: 0.0
+                val longitude = snapshot.child("lng").getValue(Double::class.java) ?: 0.0
+                val userLocation = LatLng(latitude, longitude)
 
-                // Remover el marcador verde previo si existe y agregar uno nuevo
-                mMap.clear()
-                mMap.addMarker(
-                    MarkerOptions().position(userLocation).title("Tú")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                )
-                mMap.addMarker(
-                    MarkerOptions().position(availableUserLocation!!).title("Usuario Disponible")
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                )
+                // Actualizar o crear el marcador del usuario autenticado
+                if (userMarker == null) {
+                    userMarker = mMap.addMarker(
+                        MarkerOptions()
+                            .position(userLocation)
+                            .title("Tú")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    )
+                } else {
+                    userMarker?.position = userLocation
+                }
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12f))
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                // Manejar el error
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    private fun setupAvailableUserMarker() {
+        // Escuchar cambios de ubicación de otros usuarios disponibles
+        val availableUsersRef = database.child("users")
+        availableUsersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+                    val userId = userSnapshot.key ?: continue
+                    if (userId == auth.currentUser?.uid) continue // Ignorar usuario autenticado
+
+                    val estado = userSnapshot.child("estado").getValue(String::class.java)
+                    if (estado == "Disponible") {
+                        val latitude = userSnapshot.child("location/lat").getValue(Double::class.java) ?: continue
+                        val longitude = userSnapshot.child("location/lng").getValue(Double::class.java) ?: continue
+                        val availableUserLocation = LatLng(latitude, longitude)
+
+                        // Actualizar o crear el marcador del usuario disponible
+                        if (availableUserMarker == null) {
+                            availableUserMarker = mMap.addMarker(
+                                MarkerOptions()
+                                    .position(availableUserLocation)
+                                    .title("Usuario Disponible")
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            )
+                        } else {
+                            availableUserMarker?.position = availableUserLocation
+                        }
+                    }
+                }
             }
+
+            override fun onCancelled(error: DatabaseError) {}
         })
     }
 }
