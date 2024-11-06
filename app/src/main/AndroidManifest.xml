@@ -22,6 +22,7 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".UserListActivity" />
         <activity android:name=".UserMapActivity" />
+        <activity android:name=".EditUserActivity" />
 
         <activity
             android:name=".MainActivity"

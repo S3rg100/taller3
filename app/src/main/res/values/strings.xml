@@ -11,4 +11,6 @@
     <string name="longitud">Longitud</string>
     <string name="latitud">Latitud</string>
     <string name="seleccionar_imagen">Seleccionar Imagen</string>
+    <string name="guardar">Guardar</string>
+    <string name="profile_image">Profile image</string>
 </resources>

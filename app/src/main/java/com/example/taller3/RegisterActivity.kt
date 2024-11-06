@@ -116,15 +116,15 @@ class RegisterActivity : AppCompatActivity() {
             registerIdentification.error = null
         }
 
-        if (TextUtils.isEmpty(latitude)) {
-            registerLatitude.error = "Requerido"
+        if (TextUtils.isEmpty(latitude) || !latitude.matches(Regex("-?\\d+(\\.\\d+)?"))) {
+            registerLatitude.error = "Latitud inválida"
             valid = false
         } else {
             registerLatitude.error = null
         }
 
-        if (TextUtils.isEmpty(longitude)) {
-            registerLongitude.error = "Requerido"
+        if (TextUtils.isEmpty(longitude) || !longitude.matches(Regex("-?\\d+(\\.\\d+)?"))) {
+            registerLongitude.error = "Longitud inválida"
             valid = false
         } else {
             registerLongitude.error = null

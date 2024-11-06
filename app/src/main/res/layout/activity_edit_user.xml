@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- activity_edit_user.xml -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,10 +10,11 @@
         android:id="@+id/emailLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Correo Electrónico"
+        android:hint="@string/correo_electrOnico"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editEmailEditText"
@@ -26,7 +27,7 @@
         android:id="@+id/nameLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Nombre"
+        android:hint="@string/nombre"
         app:layout_constraintTop_toBottomOf="@id/emailLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +43,7 @@
         android:id="@+id/lastNameLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Apellido"
+        android:hint="@string/apellido"
         app:layout_constraintTop_toBottomOf="@id/nameLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +59,7 @@
         android:id="@+id/identificationLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Número de Identificación"
+        android:hint="@string/numero_de_identificacion"
         app:layout_constraintTop_toBottomOf="@id/lastNameLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,12 +71,34 @@
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Button
+        android:id="@+id/selectImageButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/seleccionar_imagen"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:layout_constraintTop_toBottomOf="@id/identificationLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/profile_image"
+        app:layout_constraintTop_toBottomOf="@id/selectImageButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:scaleType="centerCrop"/>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/latitudeLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Latitud"
-        app:layout_constraintTop_toBottomOf="@id/identificationLayout"
+        android:hint="@string/latitud"
+        app:layout_constraintTop_toBottomOf="@id/profileImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp">
@@ -84,14 +107,14 @@
             android:id="@+id/editLatitudeEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal|numberSigned" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/longitudeLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Longitud"
+        android:hint="@string/longitud"
         app:layout_constraintTop_toBottomOf="@id/latitudeLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -101,27 +124,16 @@
             android:id="@+id/editLongitudeEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal|numberSigned" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/selectImageButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar Imagen"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        app:layout_constraintTop_toBottomOf="@id/longitudeLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
 
     <Button
         android:id="@+id/saveButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Guardar Cambios"
+        android:text="@string/guardar"
         style="@style/Widget.MaterialComponents.Button"
-        app:layout_constraintTop_toBottomOf="@id/selectImageButton"
+        app:layout_constraintTop_toBottomOf="@id/longitudeLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp" />

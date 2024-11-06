@@ -16,7 +16,8 @@ class UserAdapter(private val userList: List<User>) : RecyclerView.Adapter<UserA
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = userList[position]
-        holder.userNameTextView.text = user.nombre
+        val userName = "${user.nombre} ${user.apellido}"
+        holder.userNameTextView.text = userName
         holder.userEmailTextView.text = user.correo
 
         // Configura el clic para abrir UserMapActivity
