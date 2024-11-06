@@ -17,7 +17,7 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var auth: FirebaseAuth
     private var userMarker: Marker? = null
-    private var availableUserMarker: Marker? = null
+    private val availableUserMarkers = mutableMapOf<String, Marker>()
     private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +35,7 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         setupAuthenticatedUserMarker()
-        setupAvailableUserMarker()
+        setupAvailableUserMarkers()
     }
 
     private fun setupAuthenticatedUserMarker() {
@@ -67,11 +67,14 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    private fun setupAvailableUserMarker() {
+    private fun setupAvailableUserMarkers() {
         // Escuchar cambios de ubicación de otros usuarios disponibles
         val availableUsersRef = database.child("users")
         availableUsersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                // Eliminar los marcadores de usuarios que ya no están disponibles
+                val currentUserIds = mutableSetOf<String>()
+
                 for (userSnapshot in snapshot.children) {
                     val userId = userSnapshot.key ?: continue
                     if (userId == auth.currentUser?.uid) continue // Ignorar usuario autenticado
@@ -84,19 +87,32 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Verificar que latitude y longitude no sean nulos antes de crear el marcador
                         if (latitude != null && longitude != null) {
                             val availableUserLocation = LatLng(latitude, longitude)
+                            currentUserIds.add(userId)
 
-                            // Actualizar o crear el marcador del usuario disponible
-                            if (availableUserMarker == null) {
-                                availableUserMarker = mMap.addMarker(
+                            // Si ya existe un marcador para este usuario, actualiza su posición
+                            if (availableUserMarkers.containsKey(userId)) {
+                                availableUserMarkers[userId]?.position = availableUserLocation
+                            } else {
+                                // Si no existe, crea un nuevo marcador para este usuario
+                                val marker = mMap.addMarker(
                                     MarkerOptions()
                                         .position(availableUserLocation)
                                         .title("Usuario Disponible")
                                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                                 )
-                            } else {
-                                availableUserMarker?.position = availableUserLocation
+                                availableUserMarkers[userId] = marker!!
                             }
                         }
+                    }
+                }
+
+                // Remover los marcadores de usuarios que ya no están disponibles
+                val iterator = availableUserMarkers.keys.iterator()
+                while (iterator.hasNext()) {
+                    val userId = iterator.next()
+                    if (!currentUserIds.contains(userId)) {
+                        availableUserMarkers[userId]?.remove()
+                        iterator.remove()
                     }
                 }
             }
@@ -105,4 +121,3 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 }
-
