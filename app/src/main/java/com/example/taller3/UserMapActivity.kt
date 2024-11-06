@@ -42,11 +42,11 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val userId = auth.currentUser?.uid ?: return
 
         // Escuchar cambios de ubicación del usuario autenticado
-        val userLocationRef = database.child("users").child(userId).child("location")
+        val userLocationRef = database.child("users").child(userId)
         userLocationRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val latitude = snapshot.child("lat").getValue(Double::class.java) ?: 0.0
-                val longitude = snapshot.child("lng").getValue(Double::class.java) ?: 0.0
+                val latitude = snapshot.child("latitud").getValue(String::class.java)?.toDoubleOrNull() ?: 0.0
+                val longitude = snapshot.child("longitud").getValue(String::class.java)?.toDoubleOrNull() ?: 0.0
                 val userLocation = LatLng(latitude, longitude)
 
                 // Actualizar o crear el marcador del usuario autenticado
@@ -78,20 +78,24 @@ class UserMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     val estado = userSnapshot.child("estado").getValue(String::class.java)
                     if (estado == "Disponible") {
-                        val latitude = userSnapshot.child("location/lat").getValue(Double::class.java) ?: continue
-                        val longitude = userSnapshot.child("location/lng").getValue(Double::class.java) ?: continue
-                        val availableUserLocation = LatLng(latitude, longitude)
+                        val latitude = userSnapshot.child("latitud").getValue(String::class.java)?.toDoubleOrNull()
+                        val longitude = userSnapshot.child("longitud").getValue(String::class.java)?.toDoubleOrNull()
 
-                        // Actualizar o crear el marcador del usuario disponible
-                        if (availableUserMarker == null) {
-                            availableUserMarker = mMap.addMarker(
-                                MarkerOptions()
-                                    .position(availableUserLocation)
-                                    .title("Usuario Disponible")
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                            )
-                        } else {
-                            availableUserMarker?.position = availableUserLocation
+                        // Verificar que latitude y longitude no sean nulos antes de crear el marcador
+                        if (latitude != null && longitude != null) {
+                            val availableUserLocation = LatLng(latitude, longitude)
+
+                            // Actualizar o crear el marcador del usuario disponible
+                            if (availableUserMarker == null) {
+                                availableUserMarker = mMap.addMarker(
+                                    MarkerOptions()
+                                        .position(availableUserLocation)
+                                        .title("Usuario Disponible")
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                                )
+                            } else {
+                                availableUserMarker?.position = availableUserLocation
+                            }
                         }
                     }
                 }
